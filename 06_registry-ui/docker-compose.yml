@@ -1,0 +1,44 @@
+services:
+  registry-ui:
+    container_name: registry-ui
+    image: joxit/docker-registry-ui:main
+    restart: always
+    ports:
+      - 80:80
+    environment:
+      - SINGLE_REGISTRY=true
+      - REGISTRY_TITLE=Docker Registry UI
+      - DELETE_IMAGES=true
+      - SHOW_CONTENT_DIGEST=true
+      - NGINX_PROXY_PASS_URL=https://registry-server:443
+      - SHOW_CATALOG_NB_TAGS=true
+      - CATALOG_MIN_BRANCHES=1
+      - CATALOG_MAX_BRANCHES=1
+      - TAGLIST_PAGE_SIZE=100
+      - REGISTRY_SECURED=false
+      - CATALOG_ELEMENTS_LIMIT=1000
+
+  registry-server:
+    container_name: registry-server
+    image: registry:2.8.2
+    restart: always
+    ports:
+      - "443:443"
+    environment:
+      REGISTRY_HTTP_HEADERS_Access-Control-Allow-Origin: '[http://myregistry.com]'
+      REGISTRY_HTTP_HEADERS_Access-Control-Allow-Methods: '[HEAD,GET,OPTIONS,DELETE]'
+      REGISTRY_HTTP_HEADERS_Access-Control-Allow-Credentials: '[true]'
+      REGISTRY_HTTP_HEADERS_Access-Control-Allow-Headers: '[Authorization,Accept,Cache-Control]'
+      REGISTRY_HTTP_HEADERS_Access-Control-Expose-Headers: '[Docker-Content-Digest]'
+
+      REGISTRY_STORAGE_DELETE_ENABLED: 'true'
+      REGISTRY_HTTP_ADDR: 0.0.0.0:443
+      REGISTRY_HTTP_TLS_CERTIFICATE: /certs/myregistry.com.crt
+      REGISTRY_HTTP_TLS_KEY: /certs/myregistry.com.key
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_PATH: /certs/htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm 
+    volumes:
+      - "./registry/data:/var/lib/registry"
+      - "/auth:/certs"
+

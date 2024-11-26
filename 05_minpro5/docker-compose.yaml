@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d/:/etc/nginx/conf.d
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./nginx/logs:/var/log/nginx
+    depends_on:
+      - web1
+      - web2
+      - web3
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+  
+  web1:
+    image: httpd:latest
+    volumes:
+      - ./web/html:/usr/local/apache2/htdocs/
+      - ./web/logs/web1:/usr/local/apache2/logs/
+    build:
+      dockerfile: ./Dockerfile
+      context: ./web
+      args:
+        INDEX_FILE: index1.html
+    deploy:
+      replicas: 1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  web2:
+    image: httpd:latest
+    volumes:
+      - ./web/html:/usr/local/apache2/htdocs/
+      - ./web/logs/web2:/usr/local/apache2/logs/
+    build:
+      dockerfile: ./Dockerfile
+      context: ./web
+      args:
+        INDEX_FILE: index2.html
+    deploy:
+      replicas: 1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  web3:
+    image: httpd:latest
+    volumes:
+      - ./web/html:/usr/local/apache2/htdocs/
+      - ./web/logs/web3:/usr/local/apache2/logs/
+    build:
+      dockerfile: ./Dockerfile
+      context: ./web
+      args:
+        INDEX_FILE: index3.html
+    deploy:
+      replicas: 1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3    
+  

@@ -1,0 +1,5 @@
+anonymous_enable=YES
+background=NO
+port_enable=YES
+connect_from_port_20=YES
+ftp_data_port=20

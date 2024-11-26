@@ -1,0 +1,22 @@
+services:
+  mongo:  # DNS 자동 등록
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root     # 필수
+      MONGO_INITDB_ROOT_PASSWORD: example  # 필수
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/ # 버전별로 상이할 수 있음
+      ME_CONFIG_BASICAUTH: false
+
+# IP:Port, username/password 4가지가 있어야 웹 서버와 데이터베이스 간 연결이 가능하다.
+# restart: always
+# ME_CONFIG_BASICAUTH: false
